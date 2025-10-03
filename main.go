@@ -14,7 +14,7 @@ import (
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*config) error
+	callback    func(*config, bool) error
 }
 
 type locationAreaList struct {
@@ -34,13 +34,13 @@ type config struct {
 
 var supportedCommands map[string]cliCommand
 
-func commandExit(cfg *config) error {
+func commandExit(cfg *config, prev bool) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
 	return nil
 }
 
-func help(cfg *config) error {
+func help(cfg *config, prev bool) error {
 	fmt.Println("Welcome to the Pokedex!")
 	fmt.Print("Usage:\n\n")
 	for k, v := range supportedCommands {
@@ -49,8 +49,21 @@ func help(cfg *config) error {
 	return nil
 }
 
-func getMap(cfg *config) error {
-	res, err := http.Get(cfg.Next)
+func getMap(cfg *config, prev bool) error {
+	var url string
+	if prev {
+		_, ok := cfg.Previous.(string)
+		if ok {
+			url = cfg.Previous.(string)
+		} else {
+			fmt.Println("\"map\" has not been used yet, so no previous locations to view. please use \"map\" first!")
+			return nil
+		}
+	} else {
+		url = cfg.Next
+	}
+	res, err := http.Get(url)
+
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -89,13 +102,19 @@ func init() {
 		},
 		"map": {
 			name:        "map",
-			description: "Display Pokemon Areas",
+			description: "Display next 20 location areas in Pokemon world",
+			callback:    getMap,
+		},
+		"mapb": {
+			name:        "mapb",
+			description: "Display previous 20 location areas in Pokemon world",
 			callback:    getMap,
 		},
 	}
 }
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
+	var prev bool
 	cfg := config{}
 	cfg.Next = "https://pokeapi.co/api/v2/location-area/"
 	for {
@@ -103,9 +122,14 @@ func main() {
 		scanner.Scan()
 		userString := scanner.Text()
 		userStringSlice := cleanInput(userString)
+		if supportedCommands[userStringSlice[0]].name == "mapb" {
+			prev = true
+		} else {
+			prev = false
+		}
 		_, ok := supportedCommands[userStringSlice[0]]
 		if ok {
-			supportedCommands[userStringSlice[0]].callback(&cfg)
+			supportedCommands[userStringSlice[0]].callback(&cfg, prev)
 		} else {
 			fmt.Println("Unknown command")
 		}
