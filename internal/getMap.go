@@ -6,6 +6,8 @@ import (
 	"io"
 	"log"
 	"net/http"
+
+	"github.com/slajuwomi/pokedexcli/internal/pokecache"
 )
 
 type LocationAreaList struct {
@@ -21,10 +23,13 @@ type LocationAreaList struct {
 type Config struct {
 	Next     string
 	Previous any
+	Cache    *pokecache.Cache
 }
 
 func GetMap(cfg *Config, prev bool) error {
 	var url string
+	currentLocationAreaList := LocationAreaList{}
+
 	if prev {
 		_, ok := cfg.Previous.(string)
 		if ok {
@@ -35,6 +40,21 @@ func GetMap(cfg *Config, prev bool) error {
 		}
 	} else {
 		url = cfg.Next
+	}
+	_, exists := cfg.Cache.CacheMap[url]
+	if exists {
+		value, _ := cfg.Cache.Get(url)
+		err := json.Unmarshal(value, &currentLocationAreaList)
+		if err != nil {
+			log.Fatal(err)
+		}
+		for _, resultStruct := range currentLocationAreaList.Results {
+			fmt.Println(resultStruct.Name)
+		}
+		cfg.Next = currentLocationAreaList.Next
+		cfg.Previous = currentLocationAreaList.Previous
+		fmt.Println("cache used")
+		return nil
 	}
 	res, err := http.Get(url)
 
@@ -49,7 +69,7 @@ func GetMap(cfg *Config, prev bool) error {
 	if err != nil {
 		log.Fatal(err)
 	}
-	currentLocationAreaList := LocationAreaList{}
+	cfg.Cache.Add(url, body)
 	err = json.Unmarshal(body, &currentLocationAreaList)
 	if err != nil {
 		log.Fatal(err)

@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/slajuwomi/pokedexcli/internal"
+	"github.com/slajuwomi/pokedexcli/internal/pokecache"
 )
 
 type cliCommand struct {
@@ -61,6 +62,7 @@ func main() {
 	var prev bool
 	cfg := internal.Config{}
 	cfg.Next = "https://pokeapi.co/api/v2/location-area/"
+	cfg.Cache = pokecache.NewCache(5000)
 	for {
 		fmt.Print("Pokedex > ")
 		scanner.Scan()
