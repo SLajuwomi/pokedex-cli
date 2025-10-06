@@ -56,11 +56,11 @@ func init() {
 			description: "Display previous 20 location areas in Pokemon world",
 			callback:    internal.GetMap,
 		},
-		// "explore": {
-		// 	name: "explore",
-		// 	description: "Get Pokemon in location area",
-		// 	callback: internal.Explore,
-		// },
+		"explore": {
+			name:        "explore",
+			description: "Get Pokemon in location area",
+			callback:    internal.Explore,
+		},
 	}
 }
 func main() {
@@ -68,18 +68,26 @@ func main() {
 	var prev bool
 	cfg := internal.Config{}
 	cfg.Next = "https://pokeapi.co/api/v2/location-area/?offset=0&limit=20"
-	cfg.Cache = pokecache.NewCache(10 * time.Second)
+	cfg.Cache = pokecache.NewCache(20 * time.Second)
 	for {
 		fmt.Print("Pokedex > ")
 		scanner.Scan()
 		userString := scanner.Text()
 		userStringSlice := cleanInput(userString)
-		if supportedCommands[userStringSlice[0]].name == "mapb" {
+		command, ok := supportedCommands[userStringSlice[0]]
+		if command.name == "mapb" {
 			prev = true
 		} else {
 			prev = false
 		}
-		_, ok := supportedCommands[userStringSlice[0]]
+		if command.name == "explore" {
+			location := userStringSlice[1:]
+			if ok {
+				cfg.Location = location[0]
+			} else {
+				fmt.Println("expected location")
+			}
+		}
 		if ok {
 			supportedCommands[userStringSlice[0]].callback(&cfg, prev)
 		} else {

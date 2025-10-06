@@ -24,6 +24,7 @@ type Config struct {
 	Next     string
 	Previous any
 	Cache    *pokecache.Cache
+	Location string
 }
 
 func GetMap(cfg *Config, prev bool) error {
@@ -52,6 +53,7 @@ func GetMap(cfg *Config, prev bool) error {
 		}
 		cfg.Next = currentLocationAreaList.Next
 		cfg.Previous = currentLocationAreaList.Previous
+		// TODO: Remove
 		fmt.Println("CACHE USED")
 		return nil
 	}
