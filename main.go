@@ -61,6 +61,11 @@ func init() {
 			description: "Get Pokemon in location area",
 			callback:    internal.Explore,
 		},
+		"catch": {
+			name:        "catch",
+			description: "Catch a Pokemon",
+			callback:    internal.Catch,
+		},
 	}
 }
 func main() {
@@ -86,6 +91,14 @@ func main() {
 				cfg.Location = location[0]
 			} else {
 				fmt.Println("expected location")
+			}
+		}
+		if command.name == "catch" {
+			pokemon := userStringSlice[1:]
+			if ok {
+				cfg.Pokemon = pokemon[0]
+			} else {
+				fmt.Println("expected pokemon name")
 			}
 		}
 		if ok {
