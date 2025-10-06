@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/slajuwomi/pokedexcli/internal"
 	"github.com/slajuwomi/pokedexcli/internal/pokecache"
@@ -55,14 +56,19 @@ func init() {
 			description: "Display previous 20 location areas in Pokemon world",
 			callback:    internal.GetMap,
 		},
+		// "explore": {
+		// 	name: "explore",
+		// 	description: "Get Pokemon in location area",
+		// 	callback: internal.Explore,
+		// },
 	}
 }
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 	var prev bool
 	cfg := internal.Config{}
-	cfg.Next = "https://pokeapi.co/api/v2/location-area/"
-	cfg.Cache = pokecache.NewCache(5000)
+	cfg.Next = "https://pokeapi.co/api/v2/location-area/?offset=0&limit=20"
+	cfg.Cache = pokecache.NewCache(10 * time.Second)
 	for {
 		fmt.Print("Pokedex > ")
 		scanner.Scan()

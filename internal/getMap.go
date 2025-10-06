@@ -41,9 +41,8 @@ func GetMap(cfg *Config, prev bool) error {
 	} else {
 		url = cfg.Next
 	}
-	_, exists := cfg.Cache.CacheMap[url]
+	value, exists := cfg.Cache.Get(url)
 	if exists {
-		value, _ := cfg.Cache.Get(url)
 		err := json.Unmarshal(value, &currentLocationAreaList)
 		if err != nil {
 			log.Fatal(err)
@@ -53,7 +52,7 @@ func GetMap(cfg *Config, prev bool) error {
 		}
 		cfg.Next = currentLocationAreaList.Next
 		cfg.Previous = currentLocationAreaList.Previous
-		fmt.Println("cache used")
+		fmt.Println("CACHE USED")
 		return nil
 	}
 	res, err := http.Get(url)
@@ -70,14 +69,18 @@ func GetMap(cfg *Config, prev bool) error {
 		log.Fatal(err)
 	}
 	cfg.Cache.Add(url, body)
+
 	err = json.Unmarshal(body, &currentLocationAreaList)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	cfg.Next = currentLocationAreaList.Next
+	cfg.Previous = currentLocationAreaList.Previous
+
 	for _, resultStruct := range currentLocationAreaList.Results {
 		fmt.Println(resultStruct.Name)
 	}
-	cfg.Next = currentLocationAreaList.Next
-	cfg.Previous = currentLocationAreaList.Previous
+
 	return nil
 }
