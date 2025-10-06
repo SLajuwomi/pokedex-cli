@@ -66,6 +66,11 @@ func init() {
 			description: "Catch a Pokemon",
 			callback:    internal.Catch,
 		},
+		"inspect": {
+			name:        "inspect",
+			description: "Get information about a caught Pokemon",
+			callback:    internal.Inspect,
+		},
 	}
 }
 func main() {
@@ -94,10 +99,10 @@ func main() {
 				fmt.Println("expected location")
 			}
 		}
-		if command.name == "catch" {
+		if command.name == "catch" || command.name == "inspect" {
 			pokemon := userStringSlice[1:]
 			if ok {
-				cfg.Pokemon = pokemon[0]
+				cfg.Pokemon = strings.ToLower(pokemon[0])
 			} else {
 				fmt.Println("expected pokemon name")
 			}
