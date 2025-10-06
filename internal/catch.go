@@ -320,6 +320,7 @@ func Catch(cfg *Config, prev bool) error {
 		if throw > difficulty {
 			fmt.Printf("%s was caught!\n", cfg.Pokemon)
 			cfg.Pokedex[cfg.Pokemon] = currentPokemonInformation
+			fmt.Println("You can now inspect it with the inspect command")
 		} else {
 			fmt.Printf("%s escaped!\n", cfg.Pokemon)
 		}
@@ -354,6 +355,7 @@ func Catch(cfg *Config, prev bool) error {
 	if throw > difficulty {
 		fmt.Printf("%s was caught!\n", cfg.Pokemon)
 		cfg.Pokedex[cfg.Pokemon] = currentPokemonInformation
+		fmt.Println("You can now inspect it with the inspect command")
 	} else {
 		fmt.Printf("%s escaped!\n", cfg.Pokemon)
 	}

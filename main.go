@@ -71,6 +71,11 @@ func init() {
 			description: "Get information about a caught Pokemon",
 			callback:    internal.Inspect,
 		},
+		"pokedex": {
+			name:        "pokedex",
+			description: "View all your caught Pokemon",
+			callback:    internal.Pokedex,
+		},
 	}
 }
 func main() {
