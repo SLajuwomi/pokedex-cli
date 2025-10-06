@@ -74,6 +74,7 @@ func main() {
 	cfg := internal.Config{}
 	cfg.Next = "https://pokeapi.co/api/v2/location-area/?offset=0&limit=20"
 	cfg.Cache = pokecache.NewCache(20 * time.Second)
+	cfg.Pokedex = make(map[string]internal.PokemonInformation)
 	for {
 		fmt.Print("Pokedex > ")
 		scanner.Scan()

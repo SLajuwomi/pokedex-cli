@@ -26,6 +26,7 @@ type Config struct {
 	Cache    *pokecache.Cache
 	Location string
 	Pokemon  string
+	Pokedex  map[string]PokemonInformation
 }
 
 func GetMap(cfg *Config, prev bool) error {

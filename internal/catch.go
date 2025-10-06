@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math/rand"
 	"net/http"
 )
 
@@ -312,6 +313,10 @@ func Catch(cfg *Config, prev bool) error {
 	}
 	body, err := io.ReadAll(res.Body)
 	res.Body.Close()
+	if res.StatusCode == 404 {
+		fmt.Printf("%s is not a valid Pokemon. Check your spelling or view %s\n", cfg.Pokemon, "https://bulbapedia.bulbagarden.net/wiki/List_of_Pok%C3%A9mon_by_National_Pok%C3%A9dex_number")
+		return nil
+	}
 	if res.StatusCode > 299 {
 		log.Fatalf("Response failed with status code: %d and \n body: %s\n", res.StatusCode, body)
 	}
@@ -323,6 +328,14 @@ func Catch(cfg *Config, prev bool) error {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("%s's base experince is: %d\n", cfg.Pokemon, currentPokemonInformation.BaseExperience)
+	fmt.Printf("Throwing a Pokeball at %s...\n", cfg.Pokemon)
+	difficulty := currentPokemonInformation.BaseExperience
+	throw := rand.Intn(700)
+	if throw > difficulty {
+		fmt.Printf("%s was caught!\n", cfg.Pokemon)
+		cfg.Pokedex[cfg.Pokemon] = currentPokemonInformation
+	} else {
+		fmt.Printf("%s escaped!\n", cfg.Pokemon)
+	}
 	return nil
 }
