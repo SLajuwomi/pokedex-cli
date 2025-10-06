@@ -307,6 +307,25 @@ func Catch(cfg *Config, prev bool) error {
 	url := baseUrl + "/pokemon/" + cfg.Pokemon
 	currentPokemonInformation := PokemonInformation{}
 
+	value, exists := cfg.Cache.Get(url)
+	if exists {
+		err := json.Unmarshal(value, &currentPokemonInformation)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println("CACHE USED")
+		fmt.Printf("Throwing a Pokeball at %s...\n", cfg.Pokemon)
+		difficulty := currentPokemonInformation.BaseExperience
+		throw := rand.Intn(700)
+		if throw > difficulty {
+			fmt.Printf("%s was caught!\n", cfg.Pokemon)
+			cfg.Pokedex[cfg.Pokemon] = currentPokemonInformation
+		} else {
+			fmt.Printf("%s escaped!\n", cfg.Pokemon)
+		}
+		return nil
+	}
+
 	res, err := http.Get(url)
 	if err != nil {
 		log.Fatal(err)
@@ -323,6 +342,7 @@ func Catch(cfg *Config, prev bool) error {
 	if err != nil {
 		log.Fatal(err)
 	}
+	cfg.Cache.Add(url, body)
 
 	err = json.Unmarshal(body, &currentPokemonInformation)
 	if err != nil {
